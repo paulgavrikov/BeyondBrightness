@@ -8,6 +8,9 @@ on:
     - cron: "0 2 * * *"
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: macos-latest
@@ -29,16 +32,29 @@ jobs:
           chmod +x ./build.sh
           ./build.sh
 
-      - name: Archive app bundle
+      - name: Package app as DMG
         run: |
-          ditto -c -k --sequesterRsrc --keepParent \
-            Build/BeyondBrightness.app \
-            Build/BeyondBrightness-${BUILD_LABEL}.zip
+          mkdir -p Build/Release
+          cp -R Build/BeyondBrightness.app Build/Release/BeyondBrightness.app
+          ln -s /Applications Build/Release/Applications
+          hdiutil create \
+            -volname "BeyondBrightness" \
+            -srcfolder Build/Release \
+            -ov \
+            -format UDZO \
+            Build/BeyondBrightness-${BUILD_LABEL}.dmg
 
       - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: BeyondBrightness-${{ env.BUILD_LABEL }}
-          path: Build/BeyondBrightness-${{ env.BUILD_LABEL }}.zip
+          path: Build/BeyondBrightness-${{ env.BUILD_LABEL }}.dmg
           if-no-files-found: error
           retention-days: 14
+
+      - name: Create GitHub release
+        if: github.event_name == 'push' && startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: Build/BeyondBrightness-${{ env.BUILD_LABEL }}.dmg
+          generate_release_notes: true

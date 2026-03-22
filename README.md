@@ -26,6 +26,13 @@ If your Mac does not support the boosted path, the app falls back to standard br
 3. Drag the slider or choose a preset like `120%` or `160%`.
 4. Open `Settings` if you want to change how the app appears in the menu bar.
 
+## Installation
+
+1. Download the latest `BeyondBrightness.dmg` release build.
+2. Open the disk image.
+3. Drag `BeyondBrightness.app` into `Applications`.
+4. Launch the app from `Applications`.
+
 ## Requirements
 
 - macOS 14 or newer
