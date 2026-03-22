@@ -1,0 +1,44 @@
+name: Build BeyondBrightness
+
+on:
+  push:
+    tags:
+      - "v*"
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Compute build label
+        run: |
+          if [ "${{ github.event_name }}" = "schedule" ]; then
+            echo "BUILD_LABEL=nightly-$(date -u +%Y%m%d)" >> "$GITHUB_ENV"
+          else
+            echo "BUILD_LABEL=${{ github.ref_name }}" >> "$GITHUB_ENV"
+          fi
+
+      - name: Build app bundle
+        run: |
+          chmod +x ./build.sh
+          ./build.sh
+
+      - name: Archive app bundle
+        run: |
+          ditto -c -k --sequesterRsrc --keepParent \
+            Build/BeyondBrightness.app \
+            Build/BeyondBrightness-${BUILD_LABEL}.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BeyondBrightness-${{ env.BUILD_LABEL }}
+          path: Build/BeyondBrightness-${{ env.BUILD_LABEL }}.zip
+          if-no-files-found: error
+          retention-days: 14
