@@ -48,8 +48,8 @@ The only user-facing permission BeyondBrightness may request is notification per
 ## Build From Source
 
 ```bash
-chmod +x /Users/paul/Coding/maxbrigtness/build.sh
-/Users/paul/Coding/maxbrigtness/build.sh
+chmod +x ./build.sh
+./build.sh
 ```
 
-The built app will be available at `/Users/paul/Coding/maxbrigtness/Build/BeyondBrightness.app`.
+The built app will be available at `./Build/BeyondBrightness.app`.
